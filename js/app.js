@@ -1,66 +1,40 @@
-// AOS 초기화
-AOS.init({
-    duration: 1000, // 애니메이션 지속 시간 
-    easing: 'ease-in-out',
-    once: false, // 스크롤 할 때마다 실행되도록 설정
-});
+// 배경 요소 선택
+const bgWrap = document.querySelectorAll('.bg-wrap > div');
 
-// Swiper 초기화 및 AOS 연동 로직
 const swiper = new Swiper('.gallery', {
-    // 기본 옵션
-    loop: true, // 무한 반복
-    speed: 800, // 슬라이드 넘어가는 속도
-    effect: 'fade', // 페이드 효과 (좌우 슬라이드가 좋으면 'slide'로 변경)
-    fadeEffect: {
-        crossFade: true
-    },
+    loop: true,
+    speed: 800,
+    effect: 'slide', 
     
-    // 네비게이션
+    // 자동 재생 
+    // autoplay: {
+    //     delay: 4000,
+    //     disableOnInteraction: false,
+    // },
+
     navigation: {
         nextEl: '.swiper-button-next',
         prevEl: '.swiper-button-prev',
     },
     
-    // 페이지네이션
     pagination: {
         el: '.swiper-pagination',
         clickable: true,
     },
 
-    // AOS 연동 이벤트
     on: {
-        // 슬라이드가 넘어가기 시작할 때 (모든 애니메이션 숨김)
         slideChangeTransitionStart: function () {
-            // 모든 aos 요소에서 'aos-animate' 클래스 제거 -> 투명해짐
-            document.querySelectorAll('.swiper-slide [data-aos]').forEach(el => {
-                el.classList.remove('aos-animate');
-            });
-        },
+            // loop 모드일 때는 realIndex를 사용해야 정확한 인덱스(0, 1, 2)를 가져옴
+            const i = this.realIndex;
 
-        // 슬라이드 이동이 끝나고 화면에 보일 때 (애니메이션 실행)
-        slideChangeTransitionEnd: function () {
-            // 현재 활성화된 슬라이드(.swiper-slide-active) 내부의 요소만 선택
-            const activeSlide = document.querySelector('.swiper-slide-active');
-            if (activeSlide) {
-                activeSlide.querySelectorAll('[data-aos]').forEach(el => {
-                    // 약간의 딜레이 후 클래스 추가 (브라우저 렌더링 보장)
-                    setTimeout(() => {
-                        el.classList.add('aos-animate');
-                    }, 50);
-                });
+            // 모든 배경의 active 클래스 제거
+            bgWrap.forEach(bg => bg.classList.remove('active'));
+            
+            // 현재 인덱스에 해당하는 배경에 active 클래스 추가
+            // bgWrap[i]가 존재하는지 확인 후 실행
+            if (bgWrap[i]) {
+                bgWrap[i].classList.add('active');
             }
         }
     }
-});
-
-// 3. 페이지 로드 시 첫 번째 슬라이드 애니메이션 강제 실행 (안전장치)
-window.addEventListener('load', () => {
-    setTimeout(() => {
-        const activeSlide = document.querySelector('.swiper-slide-active');
-        if (activeSlide) {
-            activeSlide.querySelectorAll('[data-aos]').forEach(el => {
-                el.classList.add('aos-animate');
-            });
-        }
-    }, 100);
 });
